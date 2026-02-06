@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Admin users for dashboard access
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Main Project Model - Each project represents a complete website/landing page
+model Project {
+  id          String   @id @default(cuid())
+  projectId   String   @unique
+  name        String
+  description String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations to all project settings
+  siteSettings    SiteSettings?
+  heroSection     HeroSection?
+  aboutSection    AboutSection?
+  servicesSection ServicesSection?
+  whyUsSection    WhyUsSection?
+  contactSection  ContactSection?
+  galleryImages   GalleryImage[]
+
+  @@index([projectId])
+  @@map("projects")
+}
+
+// Global Site Settings - SEO, Metadata, Contact Info
+model SiteSettings {
+  id              String   @id @default(cuid())
+  projectId       String   @unique // Link to project
+  // SEO & Metadata
+  siteTitle       String   @default("قهوجيين الرياض - ضيافة عربية فاخرة في الرياض")
+  siteDescription String   @default("قهوجيين الرياض تقدم خدمات الضيافة والقهوة العربية الفاخرة لجميع المناسبات الخاصة والرسمية في الرياض.")
+  siteKeywords    String[] // Array of keywords for SEO
+
+  // Contact Information
+  phone    String @default("+966506451744")
+  whatsapp String @default("+966506451744")
+  email    String @default("info@qahwajialriyad.com")
+  address  String @default("الرياض، المملكة العربية السعودية")
+
+  // Branding
+  brandName String @default("قهوجيين الرياض")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("site_settings")
+}
+
+// Hero Section Content
+model HeroSection {
+  id                String   @id @default(cuid())
+  projectId         String   @unique // Link to project
+  headline          String   @default("ضيافة عربية أصيلة بلمسة فاخرة")
+  headlineHighlight String? // Text to highlight (e.g., "أصيلة")
+  subheadline       String   @default("نقدم خدمات القهوة العربية والضيافة الراقية لمناسباتكم الخاصة والرسمية في الرياض، بأعلى معايير الجودة والأصالة السعودية")
+  primaryCtaText    String   @default("احجز خدمتك الآن")
+  primaryCtaLink    String   @default("tel:+966506451744")
+  secondaryCtaText  String   @default("تعرف على خدماتنا")
+  secondaryCtaLink  String   @default("#services")
+  backgroundImage   String? // URL or path to background image
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("hero_section")
+}
+
+// About Section Content
+model AboutSection {
+  id           String  @id @default(cuid())
+  projectId    String  @unique
+  label        String  @default("من نحن")
+  title        String  @default("إرث عريق في الضيافة السعودية")
+  description1 String  @default("نحن في قهوجيين الرياض نؤمن بأن القهوة العربية ليست مجرد مشروب، بل هي رمز للكرم والأصالة السعودية العريقة. نقدم خدمات الضيافة الفاخرة بأيدي فريق محترف يجسد قيم الضيافة العربية الأصيلة.")
+  image        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("about_section")
+}
+
+// Services Section Header
+model ServicesSection {
+  id          String   @id @default(cuid())
+  projectId   String   @unique // Link to project
+  label       String   @default("خدماتنا")
+  title       String   @default("خدمات ضيافة متكاملة")
+  description String   @default("نقدم مجموعة شاملة من خدمات الضيافة العربية لتلبية احتياجات جميع المناسبات")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  services Service[]
+
+  @@index([projectId])
+  @@map("services_section")
+}
+
+// Individual Service Items
+model Service {
+  id          String   @id @default(cuid())
+  sectionId   String
+  icon        String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  section ServicesSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@map("services")
+}
+
+// Why Us Section Content
+model WhyUsSection {
+  id          String @id @default(cuid())
+  projectId   String @unique // Link to project
+  label       String @default("لماذا نحن")
+  title       String @default("الخيار الأمثل لمناسباتكم")
+  description String @default("نفخر بكوننا الخيار الأول للعديد من العائلات والشركات في الرياض. تميزنا ينبع من شغفنا بالضيافة السعودية الأصيلة وحرصنا على إرضاء عملائنا.")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project  Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  features WhyUsFeature[]
+
+  @@index([projectId])
+  @@map("why_us_section")
+}
+
+// Why Us Features
+model WhyUsFeature {
+  id          String   @id @default(cuid())
+  sectionId   String
+  icon        String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  section WhyUsSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@map("why_us_features")
+}
+
+// Contact Section Content
+model ContactSection {
+  id          String   @id @default(cuid())
+  projectId   String   @unique // Link to project
+  label       String   @default("تواصل معنا")
+  title       String   @default("احجز خدمتك الآن")
+  description String   @default("تواصل معنا لحجز خدمات الضيافة لمناسبتك القادمة")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("contact_section")
+}
+
+// Gallery Images (for future use)
+model GalleryImage {
+  id        String   @id @default(cuid())
+  projectId String // Link to project
+  url       String
+  alt       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("gallery_images")
+}
