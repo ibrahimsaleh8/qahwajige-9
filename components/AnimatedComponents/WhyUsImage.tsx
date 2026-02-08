@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "motion/react";
 import Image from "next/image";
-import WhyusImage from "@/public/images/why-us.webp";
+import WhyusImage from "@/public/images/why-us.jpeg";
 
 export default function WhyUsImage() {
   return (
@@ -16,7 +16,7 @@ export default function WhyUsImage() {
         alt="لماذا تختار قهوجيين الرياض لمناسبتك؟"
         width={600}
         height={600}
-        className="w-full h-full object-cover object-top"
+        className="w-full h-full object-cover object-center"
       />
     </motion.div>
   );

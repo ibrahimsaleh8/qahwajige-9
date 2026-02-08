@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { CurrentProjectId } from "@/lib/ProjectId";
 
 export async function PUT(
   request: NextRequest,
@@ -83,7 +82,7 @@ export async function PUT(
         updatedAt: true,
       },
     });
-    revalidatePath(`project/${CurrentProjectId}/metatag`);
+    revalidatePath("/", "layout");
 
     return NextResponse.json(
       {

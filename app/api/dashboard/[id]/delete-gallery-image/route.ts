@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { CurrentProjectId } from "@/lib/ProjectId";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -85,7 +84,7 @@ export async function DELETE(
     await prisma.galleryImage.delete({
       where: { id: imageId },
     });
-    revalidatePath(`project/${CurrentProjectId}/main-data`);
+    revalidatePath("/", "page");
     return NextResponse.json(
       {
         success: true,

@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { CurrentProjectId } from "@/lib/ProjectId";
 
 export async function PUT(
   request: NextRequest,
@@ -63,7 +62,7 @@ export async function PUT(
         icon,
       },
     });
-    revalidatePath(`project/${CurrentProjectId}/main-data`);
+    revalidatePath("/", "page");
 
     return NextResponse.json(
       {
