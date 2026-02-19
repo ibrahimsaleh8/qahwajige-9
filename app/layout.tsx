@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
-import { getProjectMetadata } from "@/server-actions/metatags";
 import { StructuredData } from "@/components/StructuredData";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
