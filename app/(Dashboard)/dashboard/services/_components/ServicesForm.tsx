@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
 import { Coffee, Users, Heart, Building2, LucideIcon } from "lucide-react";
+import { APP_URL } from "@/lib/ProjectId";
 
 interface Service {
   id: string;
@@ -91,7 +92,7 @@ export default function ServicesForm({
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-service`,
+        `${APP_URL}/api/dashboard/${projectId}/update-service`,
         {
           method: "PUT",
           headers: {
@@ -108,7 +109,6 @@ export default function ServicesForm({
 
       if (res.ok) {
         const data = await res.json();
-        // Update the service with the returned data to get new updatedAt timestamp
         if (data.data?.service) {
           setServices(
             services.map((service) =>
@@ -120,6 +120,7 @@ export default function ServicesForm({
         }
         Toast({ icon: "success", message: "تم حفظ الخدمة بنجاح" });
         setEditingServiceId(null);
+        await fetch("/api/revalidate-main-data");
       } else {
         const errorData = await res.json().catch(() => null);
         console.error("Error response:", errorData);
@@ -159,7 +160,7 @@ export default function ServicesForm({
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-services`,
+        `${APP_URL}/api/dashboard/${projectId}/update-services`,
         {
           method: "PUT",
           headers: {
@@ -179,6 +180,7 @@ export default function ServicesForm({
           message: errorData?.message || "حدث خطأ أثناء الحفظ",
         });
       }
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       console.error("Error saving section data:", error);
       Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });

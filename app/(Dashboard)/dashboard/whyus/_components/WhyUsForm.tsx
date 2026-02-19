@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
 import { Award, Clock, Shield, Sparkles, LucideIcon } from "lucide-react";
+import { APP_URL } from "@/lib/ProjectId";
 
 export interface WhyUsFeature {
   id: string;
@@ -62,7 +63,7 @@ export default function WhyUsForm({ projectId, whyUsSection }: WhyUsFormProps) {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-why-us-section`,
+        `${APP_URL}/api/dashboard/${projectId}/update-why-us-section`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -79,6 +80,7 @@ export default function WhyUsForm({ projectId, whyUsSection }: WhyUsFormProps) {
           message: errorData?.message || "حدث خطأ أثناء الحفظ",
         });
       }
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       console.error("Error saving section:", error);
       Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });
@@ -114,7 +116,7 @@ export default function WhyUsForm({ projectId, whyUsSection }: WhyUsFormProps) {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-why-us-feature`,
+        `${APP_URL}/api/dashboard/${projectId}/update-why-us-feature`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -138,6 +140,7 @@ export default function WhyUsForm({ projectId, whyUsSection }: WhyUsFormProps) {
         }
         Toast({ icon: "success", message: "تم حفظ الميزة بنجاح" });
         setEditingFeatureId(null);
+        await fetch("/api/revalidate-main-data");
       } else {
         const errorData = await res.json().catch(() => null);
         Toast({

@@ -1,5 +1,8 @@
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import MainDashboardData from "./_components/MainDashboardData";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export type ProjectMainData = {
   data: {
     project: {
@@ -21,9 +24,20 @@ export type ProjectMainData = {
     };
   };
 };
+
 export default async function Dashboard() {
+  // Server-side auth guard: if there is no token cookie, redirect to login
+  const token = (await cookies()).get("token");
+
+  if (!token) {
+    redirect("/(Dashboard)/login");
+  }
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-project-main-data`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-project-main-data`,
+    {
+      cache: "no-store",
+    }
   );
   const data = (await res.json()) as ProjectMainData;
   return (

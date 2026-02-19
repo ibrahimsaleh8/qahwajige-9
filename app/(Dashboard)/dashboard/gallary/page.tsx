@@ -1,5 +1,5 @@
 // app/dashboard/[id]/gallery/page.tsx
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import GalleryManager from "./_components/GalleryManager";
 
 interface GalleryImage {
@@ -21,7 +21,10 @@ export interface GetGalleryResponse {
 
 export default async function GalleryPage() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-gallery-images`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-gallery-images`,
+    {
+      cache: "no-store",
+    }
   );
 
   if (!res.ok) {

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { APP_URL } from "@/lib/ProjectId";
 
 interface KeywordsFormProps {
   projectId: string;
@@ -62,7 +63,7 @@ export default function KeywordsForm({
       setError(null);
 
       const response = await fetch(
-        `/api/dashboard/${projectId}/update-keywrords`,
+        `${APP_URL}/api/dashboard/${projectId}/update-keywrords`,
         {
           method: "PUT",
           headers: {
@@ -81,6 +82,8 @@ export default function KeywordsForm({
         });
         return;
       }
+
+      await fetch("/api/revalidate-metatags");
 
       // Refresh the page data
       router.refresh();

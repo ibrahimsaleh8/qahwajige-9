@@ -1,4 +1,4 @@
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import ServicesForm from "./_components/ServicesForm";
 interface Service {
   id: string;
@@ -28,7 +28,10 @@ export interface GetServicesResponse {
 
 export default async function Services() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-services`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-services`,
+    {
+      cache: "no-store",
+    }
   );
   const data: GetServicesResponse = await res.json();
   return (

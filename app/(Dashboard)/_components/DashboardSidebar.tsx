@@ -8,13 +8,22 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Info, ToolCase, Star, Key, ImageIcon } from "lucide-react"; // Import icons
+import {
+  Home,
+  Info,
+  ToolCase,
+  Star,
+  Key,
+  ImageIcon,
+  Package,
+} from "lucide-react"; // Import icons
 
 // Menu items with icons
 const items = [
   { title: "الرئيسية", url: "/dashboard", icon: Home },
   { title: "عنّا", url: "/dashboard/about", icon: Info },
   { title: "خدمات", url: "/dashboard/services", icon: ToolCase },
+  { title: "باقات", url: "/dashboard/packages", icon: Package },
   { title: "لماذا نحن؟", url: "/dashboard/whyus", icon: Star },
   { title: "كلمات مفتاحية", url: "/dashboard/keywords", icon: Key },
   { title: "معرض", url: "/dashboard/gallary", icon: ImageIcon },

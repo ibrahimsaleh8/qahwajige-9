@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ImageUp } from "lucide-react";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
+import { APP_URL } from "@/lib/ProjectId";
 
 interface GalleryImage {
   id: string;
@@ -63,7 +64,7 @@ export default function GalleryManager({
       }
 
       const response = await fetch(
-        `/api/dashboard/${projectId}/add-gallery-image`,
+        `${APP_URL}/api/dashboard/${projectId}/add-gallery-image`,
         {
           method: "POST",
           body: formData,
@@ -100,6 +101,8 @@ export default function GalleryManager({
           message: "تم رفع الصورة بنجاح",
         });
       }
+
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "فشل في رفع الصورة";
@@ -121,7 +124,7 @@ export default function GalleryManager({
 
     try {
       const response = await fetch(
-        `/api/dashboard/${projectId}/delete-gallery-image`,
+        `${APP_URL}/api/dashboard/${projectId}/delete-gallery-image`,
         {
           method: "DELETE",
           headers: {
@@ -151,6 +154,7 @@ export default function GalleryManager({
         icon: "success",
         message: "تم حذف الصورة بنجاح",
       });
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "فشل في حذف الصورة";

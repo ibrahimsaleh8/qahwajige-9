@@ -1,4 +1,4 @@
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import WhyUsForm from "./_components/WhyUsForm";
 
 interface WhyUsFeature {
@@ -29,7 +29,7 @@ export interface GetWhyUsResponse {
 
 export default async function WhyUs() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-whyus`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-whyus`,
     {
       cache: "no-store",
     },

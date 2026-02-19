@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Toast } from "../../_components/Toast";
+import { APP_URL } from "@/lib/ProjectId";
 
 interface Project {
   id: string;
@@ -71,7 +72,7 @@ export default function MainDashboardData({
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${project.id}/update-project-main-data`,
+        `${APP_URL}/api/dashboard/${project.id}/update-project-main-data`,
         {
           method: "PUT",
           headers: {
@@ -88,6 +89,7 @@ export default function MainDashboardData({
         console.error("Error response:", errorData);
         Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });
       }
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       console.error("Error saving data:", error);
       Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });

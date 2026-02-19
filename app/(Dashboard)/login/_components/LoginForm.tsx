@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { APP_URL } from "@/lib/ProjectId";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -17,12 +18,13 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const res = await fetch("/api/admin/login", {
+      const res = await fetch(`${APP_URL}/api/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -32,6 +34,15 @@ export default function LoginForm() {
         return;
       }
 
+      // If the API returns a token in the JSON body, persist it in a client cookie
+      if (data?.token) {
+        // Store token in a cookie accessible on the client
+        document.cookie = `token=${data.token}; path=/; max-age=${
+          60 * 60 * 24 * 7
+        }; sameSite=Lax`;
+      }
+
+      console.log("Login DATA", data);
       // Redirect to admin dashboard
       router.push("/dashboard");
     } catch (err) {
@@ -43,7 +54,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 text-black!">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 text-black">
       <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
         <h1 className="text-2xl font-bold text-center mb-6">
           تسجيل الدخول ادمين
@@ -87,7 +98,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50">
+            className="w-full cursor-pointer bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50">
             {loading ? "جارى تسجيل الدخول..." : "تسجيل الدخول"}
           </button>
         </form>

@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import { getProjectMetadata } from "@/server-actions/metatags";
 import { StructuredData } from "@/components/StructuredData";
 import { Analytics } from "@vercel/analytics/next";
@@ -11,10 +11,24 @@ const cairoFont = Cairo({
   weight: ["1000", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["arabic"],
 });
+type MetaDataResponseDataType = {
+  title: string;
+  description: string;
+  keywords: string[];
+  brandName: string;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const data = await getProjectMetadata(CurrentProjectId);
+    const res = await fetch(
+      `${APP_URL}/api/project/${CurrentProjectId}/metadata`,
+      {
+        next: {
+          tags: ["metadata"],
+        },
+      },
+    );
+    const data: MetaDataResponseDataType = await res.json();
 
     const title = data.title || data.brandName;
     const description = data.description;
@@ -71,7 +85,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const data = await getProjectMetadata(CurrentProjectId);
+  const res = await fetch(
+    `${APP_URL}/api/project/${CurrentProjectId}/metadata`,
+  );
+  const data: MetaDataResponseDataType = await res.json();
 
   return (
     <html lang="ar" dir="rtl">
@@ -80,7 +97,6 @@ export default async function RootLayout({
           name={data.brandName}
           description={data.description}
           url={process.env.NEXT_PUBLIC_APP_URL as string}
-          phone={data.phone}
         />
       </head>
       <body className={`${cairoFont.className} antialiased`}>

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
 import Image from "next/image";
+import { APP_URL } from "@/lib/ProjectId";
 
 interface AboutSection {
   id: string;
@@ -56,15 +57,13 @@ export default function AboutProjectForm({
     const data = new FormData();
     data.append("file", file);
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/upload-images`,
-      {
-        method: "POST",
-        body: data,
-      },
-    );
+    const res = await fetch(`${APP_URL}/api/upload-images`, {
+      method: "POST",
+      body: data,
+    });
 
     const result = await res.json();
+
     return result.data.url;
   };
 
@@ -79,7 +78,7 @@ export default function AboutProjectForm({
         imageUrl = await uploadImage(file);
 
         res = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-about-project`,
+          `${APP_URL}/api/dashboard/${projectId}/update-about-project`,
           {
             method: "PUT",
             headers: {
@@ -90,7 +89,7 @@ export default function AboutProjectForm({
         );
       } else {
         res = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${projectId}/update-about-project`,
+          `${APP_URL}/api/dashboard/${projectId}/update-about-project`,
           {
             method: "PUT",
             headers: {
@@ -108,6 +107,8 @@ export default function AboutProjectForm({
         console.error("Error response:", errorData);
         Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });
       }
+
+      await fetch("/api/revalidate-main-data");
     } catch (error) {
       console.error("Error saving about project data:", error);
       Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });

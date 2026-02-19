@@ -1,4 +1,4 @@
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import AboutProjectForm from "./_components/AboutProjectForm";
 
 interface AboutSection {
@@ -19,7 +19,10 @@ export interface GetAboutProjectResponse {
 
 export default async function AboutProject() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-about-project`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-about-project`,
+    {
+      cache: "no-store",
+    }
   );
   const data: GetAboutProjectResponse = await res.json();
 

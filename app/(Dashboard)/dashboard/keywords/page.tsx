@@ -1,5 +1,5 @@
 // app/dashboard/[id]/keywords/page.tsx
-import { CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import KeywordsForm from "./_components/KeywordsForm";
 
 interface KeywordsData {
@@ -16,10 +16,10 @@ export interface GetKeywordsResponse {
 
 export default async function KeywordsPage() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/${CurrentProjectId}/get-keywords`,
+    `${APP_URL}/api/dashboard/${CurrentProjectId}/get-keywords`,
     {
       cache: "no-store",
-    },
+    }
   );
 
   if (!res.ok) {
