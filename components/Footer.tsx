@@ -5,12 +5,13 @@ const mapEmbedSrc =
   "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7247.733529263881!2d46.7653!3d24.731454!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f013bec0d4b7b%3A0xeb4d9048d7b13647!2z2YLZh9mI2KzZiiDZiNi12KjYp9io2YrZhiDZgtmH2YjYqSDYp9mE2LHZitin2LY!5e0!3m2!1sar!2str!4v1728329118756!5m2!1sar!2str";
 
 const sitemapLinks = [
-  { name: "الرئيسية", href: "#home" },
-  { name: "تعرف علينا", href: "#about" },
-  { name: "ماذا نقدم", href: "#services" },
-  { name: "الأسئلة الشائعة", href: "#faq" },
-  { name: "أعمالنا", href: "#gallery" },
-  { name: "احجز الآن", href: "#contact" },
+  { name: "الرئيسية", href: "/#home" },
+  { name: "تعرف علينا", href: "/#about" },
+  { href: "/articles", name: "خدمات الضيافة" },
+  { name: "ماذا نقدم", href: "/#services" },
+  { name: "الأسئلة الشائعة", href: "/#faq" },
+  { name: "أعمالنا", href: "/#gallery" },
+  { name: "احجز الآن", href: "/#contact" },
 ];
 
 export default function Footer({

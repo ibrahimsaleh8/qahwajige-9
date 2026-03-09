@@ -130,3 +130,76 @@ body {
     @apply bg-slate-950 text-slate-100;
   }
 }
+.editor-content h1 {
+  @apply text-5xl font-bold my-4;
+}
+
+.editor-content h2 {
+  @apply text-4xl font-semibold my-3;
+}
+
+.editor-content h3 {
+  @apply text-3xl font-semibold my-2;
+}
+
+.editor-content p {
+  @apply text-base my-2;
+}
+
+.editor-content ul,
+.editor-content ol {
+  @apply list-inside my-2;
+}
+
+.editor-content a {
+  @apply text-blue-600 underline;
+}
+
+.editor-content strong {
+  @apply font-bold;
+}
+
+.editor-content em {
+  @apply italic;
+}
+
+.editor-content s {
+  @apply line-through;
+}
+
+.article-content h1 {
+  @apply text-5xl font-bold my-4;
+}
+
+.article-content h2 {
+  @apply text-4xl font-semibold my-3;
+}
+
+.article-content h3 {
+  @apply text-3xl font-semibold my-2;
+}
+
+.article-content p {
+  @apply text-base my-2;
+}
+
+.article-content ul,
+.article-content ol {
+  @apply list-inside my-2;
+}
+
+.article-content a {
+  @apply text-blue-700 underline;
+}
+
+.article-content strong {
+  @apply font-bold;
+}
+
+.article-content em {
+  @apply italic;
+}
+
+.article-content s {
+  @apply line-through;
+}

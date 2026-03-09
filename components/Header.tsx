@@ -7,11 +7,12 @@ import { HeaderData } from "@/lib/responseType";
 import Link from "next/link";
 
 const navLinks = [
-  { href: "#about", label: "تعرف علينا" },
-  { href: "#services", label: "ماذا نقدم" },
-  { href: "#faq", label: "الأسئلة الشائعة" },
-  { href: "#gallery", label: "أعمالنا" },
-  { href: "#contact", label: "احجز الآن" },
+  { href: "/#about", label: "تعرف علينا" },
+  { href: "/#services", label: "ماذا نقدم" },
+  { href: "/articles", label: "خدمات الضيافة" },
+  { href: "/#faq", label: "الأسئلة الشائعة" },
+  { href: "/#gallery", label: "أعمالنا" },
+  { href: "/#contact", label: "احجز الآن" },
 ];
 
 export function Header({

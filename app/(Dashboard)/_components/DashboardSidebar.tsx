@@ -16,6 +16,7 @@ import {
   Key,
   ImageIcon,
   Package,
+  Newspaper,
 } from "lucide-react"; // Import icons
 
 // Menu items with icons
@@ -27,6 +28,7 @@ const items = [
   { title: "لماذا نحن؟", url: "/dashboard/whyus", icon: Star },
   { title: "كلمات مفتاحية", url: "/dashboard/keywords", icon: Key },
   { title: "معرض", url: "/dashboard/gallary", icon: ImageIcon },
+  { title: "خدمات الضيافة", url: "/dashboard/articles", icon: Newspaper },
 ];
 
 export function DashboardSidebar() {
