@@ -17,6 +17,9 @@ import {
   ImageIcon,
   Package,
   Newspaper,
+  Share2,
+  LayoutTemplate,
+  Wand2,
 } from "lucide-react"; // Import icons
 
 // Menu items with icons
@@ -29,6 +32,17 @@ const items = [
   { title: "كلمات مفتاحية", url: "/dashboard/keywords", icon: Key },
   { title: "معرض", url: "/dashboard/gallary", icon: ImageIcon },
   { title: "خدمات الضيافة", url: "/dashboard/articles", icon: Newspaper },
+  { title: "وسائل التواصل", url: "/dashboard/social-media", icon: Share2 },
+  {
+    title: "الأقسام المخصصة",
+    url: "/dashboard/custom-sections",
+    icon: LayoutTemplate,
+  },
+  {
+    title: "إنشاء بالذكاء الاصطناعي",
+    url: "/dashboard/ai-articles",
+    icon: Wand2,
+  },
 ];
 
 export function DashboardSidebar() {

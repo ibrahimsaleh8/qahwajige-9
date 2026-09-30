@@ -1,7 +1,8 @@
-import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
+import { APP_URL, CurrentProjectId, currentURL } from "@/lib/ProjectId";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Metadata } from "next";
 
 type Article = {
   id: string;
@@ -20,9 +21,31 @@ type GetArticlesResponse = {
   };
 };
 
+export const metadata: Metadata = {
+  title: "خدمات الضيافة العربية | مقالات ونصائح في القهوة وتنظيم المناسبات",
+  description:
+    "استكشف محتوى متخصص في خدمات الضيافة، القهوة العربية، وتنظيم المناسبات، مع مقالات ونصائح عملية تساعدك على تقديم ضيافة احترافية وتجربة مميزة لضيوفك.",
+  alternates: {
+    canonical: `${currentURL}/articles`,
+  },
+  openGraph: {
+    title: "خدمات الضيافة العربية | مقالات ونصائح في القهوة وتنظيم المناسبات",
+    description:
+      "استكشف محتوى متخصص في خدمات الضيافة، القهوة العربية، وتنظيم المناسبات، مع مقالات ونصائح عملية تساعدك على تقديم ضيافة احترافية وتجربة مميزة لضيوفك.",
+    url: `${currentURL}/articles`,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "خدمات الضيافة العربية | مقالات ونصائح في القهوة وتنظيم المناسبات",
+    description:
+      "استكشف محتوى متخصص في خدمات الضيافة، القهوة العربية، وتنظيم المناسبات، مع مقالات ونصائح عملية تساعدك على تقديم ضيافة احترافية وتجربة مميزة لضيوفك.",
+  },
+};
+
 export default async function ArticlesPage() {
   const res = await fetch(
-    `${APP_URL}/api/project/${CurrentProjectId}/articles`,
+    `${APP_URL}/api/project/${CurrentProjectId}/articles/category/خدمات-الضيافة`,
   );
 
   if (!res.ok) {
@@ -34,7 +57,7 @@ export default async function ArticlesPage() {
 
   return (
     <section id="articles" className="py-10 min-h-[60vh] pt-25">
-      <div className="px-4 md:px-6 lg:px-8 max-w-6xl mx-auto text-black">
+      <div className="px-4 md:px-6 lg:px-8 container mx-auto text-black">
         {/* Header */}
         <div className="mb-14">
           <Link
@@ -66,7 +89,7 @@ export default async function ArticlesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid md:gap-6 gap-3 grid-cols-2 lg:grid-cols-4">
             {articles.map((article) => (
               <Link
                 href={`/${article.title.split(" ").join("-")}`}
@@ -77,7 +100,7 @@ export default async function ArticlesPage() {
                   boxShadow: "0 4px 20px rgba(44,24,16,0.06)",
                 }}>
                 {article.coverImage && (
-                  <div className="relative w-full aspect-4/3 overflow-hidden">
+                  <div className="relative w-full md:aspect-4/3 aspect-3/2 overflow-hidden">
                     <Image
                       src={article.coverImage}
                       alt={article.title}
@@ -87,38 +110,31 @@ export default async function ArticlesPage() {
                   </div>
                 )}
 
-                <div className="flex flex-col flex-1 p-6">
+                <div className="flex flex-col flex-1 md:p-6 p-2">
                   <h2
-                    className="font-black text-lg mb-3 line-clamp-2"
+                    className="font-black md:text-lg text-base mb-3 line-clamp-2"
                     style={{ color: "var(--main-color)" }}>
                     {article.title}
                   </h2>
 
                   {article.content && (
                     <p
-                      className="text-sm leading-relaxed line-clamp-3 flex-1 mb-4"
+                      className="md:text-sm text-xs leading-relaxed line-clamp-3 flex-1 mb-4"
                       style={{ color: "var(--main-color-dark)" }}>
                       {article.content.replace(/<[^>]+>/g, "")}
                     </p>
                   )}
-
-                  <div
-                    className="flex items-center justify-between mt-auto pt-4 border-t"
-                    style={{ borderColor: "var(--border-warm)" }}>
-                    <span className="text-xs text-black/90">
-                      {new Date(article.createdAt).toLocaleDateString("ar-SA", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                    <span
-                      className="text-xs font-semibold flex items-center gap-1"
-                      style={{ color: "var(--accent-gold)" }}>
-                      اقرأ المقال
-                      <ArrowLeft className="w-3 h-3" strokeWidth={2} />
-                    </span>
-                  </div>
+                  <span className="text-xs text-black/90 mb-2">
+                    {new Date(article.createdAt).toLocaleDateString("ar-SA", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                  <span className="text-xs font-semibold flex items-center justify-center w-full text-center bg-main-color py-2 rounded-2xl gap-1 ">
+                    اقرأ المقال
+                    <ArrowLeft className="w-3 h-3" strokeWidth={2} />
+                  </span>
                 </div>
               </Link>
             ))}

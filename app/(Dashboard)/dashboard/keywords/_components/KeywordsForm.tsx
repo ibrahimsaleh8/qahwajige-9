@@ -27,6 +27,10 @@ export default function KeywordsForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // AI-generated keyword suggestions
+  const [generatedKeywords, setGeneratedKeywords] = useState<string[]>([]);
+  const [generating, setGenerating] = useState(false);
+
   const handleAddKeyword = () => {
     const trimmed = newKeyword.trim();
 
@@ -55,6 +59,70 @@ export default function KeywordsForm({
       e.preventDefault();
       handleAddKeyword();
     }
+  };
+
+  // Remove a single AI-suggested keyword before adding to the list
+  const handleRemoveGeneratedKeyword = (index: number) => {
+    setGeneratedKeywords((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Call the AI keyword generator API
+  const handleGenerateKeywords = async () => {
+    try {
+      setGenerating(true);
+      setError(null);
+      setGeneratedKeywords([]);
+
+      const response = await fetch(`${APP_URL}/api/v1/seo/keyword-generator`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ projectId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        Toast({
+          icon: "error",
+          message: result.message || "فشل في توليد الكلمات المفتاحية",
+        });
+        return;
+      }
+
+      const fetched: string[] = result.data?.keywords ?? [];
+      if (fetched.length === 0) {
+        Toast({ icon: "error", message: "لم يتم توليد أي كلمات مفتاحية" });
+        return;
+      }
+
+      setGeneratedKeywords(fetched);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "حدث خطأ أثناء التوليد";
+      setError(msg);
+      Toast({ icon: "error", message: `خطأ: ${msg}` });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Merge AI-suggested keywords into the main list (skip duplicates)
+  const handleAddGeneratedToForm = () => {
+    if (generatedKeywords.length === 0) return;
+
+    const unique = generatedKeywords.filter((k) => !keywords.includes(k));
+    if (unique.length === 0) {
+      Toast({ icon: "error", message: "جميع الكلمات المقترحة موجودة بالفعل" });
+      return;
+    }
+
+    setKeywords((prev) => [...prev, ...unique]);
+    setGeneratedKeywords([]);
+    Toast({
+      icon: "success",
+      message: `تمت إضافة ${unique.length} كلمة مفتاحية`,
+    });
   };
 
   const handleSave = async () => {
@@ -136,6 +204,105 @@ export default function KeywordsForm({
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
+
+      {/* AI Keyword Generator */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">
+              توليد كلمات مفتاحية بالذكاء الاصطناعي
+            </h2>
+            <p className="text-sm text-gray-500 mt-0.5">
+              يقوم الذكاء الاصطناعي بتحليل موقعك وتوليد كلمات مفتاحية مقترحة
+            </p>
+          </div>
+          <Button
+            onClick={handleGenerateKeywords}
+            disabled={generating}
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white">
+            {generating ? (
+              <>
+                <svg
+                  className="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+                جاري التوليد...
+              </>
+            ) : (
+              <>
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                توليد كلمات مفتاحية
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Generated keyword tags */}
+        {generatedKeywords.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-700">
+                الكلمات المقترحة ({generatedKeywords.length})
+              </p>
+              <button
+                onClick={() => setGeneratedKeywords([])}
+                className="text-xs text-gray-400 hover:text-red-500 transition-colors">
+                مسح الكل
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 p-4 bg-purple-50 border border-purple-100 rounded-lg">
+              {generatedKeywords.map((kw, index) => (
+                <div
+                  key={index}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-purple-200 text-purple-800 rounded-full hover:shadow-sm transition-all"
+                  dir="auto">
+                  <span className="text-sm font-medium">{kw}</span>
+                  <button
+                    onClick={() => handleRemoveGeneratedKeyword(index)}
+                    className="text-purple-400 hover:text-red-500 font-bold text-base leading-none transition-colors"
+                    aria-label="حذف الكلمة المقترحة"
+                    title="حذف">
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              onClick={handleAddGeneratedToForm}
+              className="w-full bg-green-600 hover:bg-green-700 text-white">
+              إضافة الكلمات المقترحة إلى القائمة
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Add Keyword Section */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">

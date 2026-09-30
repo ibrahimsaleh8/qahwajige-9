@@ -5,8 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/app/(Dashboard)/_components/Toast";
-import { Coffee, Users, Heart, Building2, LucideIcon } from "lucide-react";
 import { APP_URL } from "@/lib/ProjectId";
+import IconPicker from "../../custom-sections/_components/IconPicker";
+import CreateServiceModal from "./CreateServiceModal";
+import Swal from "sweetalert2";
+import { Trash2 } from "lucide-react";
+import { getIconComponent } from "@/lib/getIconComponent";
 
 interface Service {
   id: string;
@@ -31,14 +35,6 @@ interface ServicesFormProps {
   servicesSection: ServicesSection;
 }
 
-// Icon mapping
-const iconMap: Record<string, LucideIcon> = {
-  Coffee,
-  Users,
-  Heart,
-  Building2,
-};
-
 export default function ServicesForm({
   projectId,
   servicesSection,
@@ -53,6 +49,7 @@ export default function ServicesForm({
 
   const [isLoading, setIsLoading] = useState(false);
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   // Track which operation is loading
   const [loadingOperation, setLoadingOperation] = useState<
     "section" | "service" | null
@@ -153,6 +150,57 @@ export default function ServicesForm({
     setEditingServiceId(null);
   };
 
+  const handleDeleteService = async (service: Service) => {
+    const result = await Swal.fire({
+      title: "حذف الخدمة؟",
+      text: `هل أنت متأكد من حذف "${service.title}"؟`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "نعم، احذف",
+      cancelButtonText: "إلغاء",
+    });
+
+    if (!result.isConfirmed) return;
+
+    setIsLoading(true);
+    setLoadingOperation("service");
+    try {
+      const res = await fetch(
+        `${APP_URL}/api/dashboard/${projectId}/delete-service`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            serviceId: service.id,
+          }),
+        },
+      );
+
+      if (res.ok) {
+        setServices(services.filter((s) => s.id !== service.id));
+        setEditingServiceId(null);
+        Toast({ icon: "success", message: "تم حذف الخدمة بنجاح" });
+        await fetch("/api/revalidate-main-data");
+      } else {
+        const errorData = await res.json().catch(() => null);
+        Toast({
+          icon: "error",
+          message: errorData?.message || "حدث خطأ أثناء الحذف",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting service:", error);
+      Toast({ icon: "error", message: "حدث خطأ أثناء الحذف" });
+    } finally {
+      setIsLoading(false);
+      setLoadingOperation(null);
+    }
+  };
+
   const handleSaveSection = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -191,7 +239,7 @@ export default function ServicesForm({
   };
 
   const getIcon = (iconName: string) => {
-    const Icon = iconMap[iconName];
+    const Icon = getIconComponent(iconName);
     return Icon ? <Icon className="w-6 h-6" /> : null;
   };
 
@@ -272,10 +320,19 @@ export default function ServicesForm({
       {/* Services Cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">الخدمات المتاحة</h2>
-          <span className="text-sm text-gray-500">
-            {services.length} {services.length === 1 ? "خدمة" : "خدمات"}
-          </span>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold">الخدمات المتاحة</h2>
+            <span className="text-sm text-gray-500">
+              {services.length} {services.length === 1 ? "خدمة" : "خدمات"}
+            </span>
+          </div>
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            size="sm"
+            disabled={isLoading}
+            className="flex items-center gap-1.5 cursor-pointer">
+            إضافة خدمة جديدة
+          </Button>
         </div>
 
         {services.length === 0 ? (
@@ -331,24 +388,13 @@ export default function ServicesForm({
                           <label className="block mb-2 text-sm font-medium text-gray-700">
                             الأيقونة
                           </label>
-                          <select
+                          <IconPicker
                             value={service.icon}
-                            onChange={(e) =>
-                              handleServiceChange(
-                                service.id,
-                                "icon",
-                                e.target.value,
-                              )
+                            onChange={(iconName) =>
+                              handleServiceChange(service.id, "icon", iconName)
                             }
-                            className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            disabled={isThisServiceLoading}>
-                            <option value="Coffee">☕ Coffee - قهوة</option>
-                            <option value="Users">👥 Users - مستخدمين</option>
-                            <option value="Heart">❤️ Heart - قلب</option>
-                            <option value="Building2">
-                              🏢 Building2 - مبنى
-                            </option>
-                          </select>
+                            disabled={isThisServiceLoading}
+                          />
                         </div>
 
                         <div>
@@ -386,6 +432,15 @@ export default function ServicesForm({
                             className="flex-1">
                             إلغاء
                           </Button>
+                          <Button
+                            onClick={() => handleDeleteService(service)}
+                            variant="destructive"
+                            size="sm"
+                            disabled={isThisServiceLoading}
+                            className="flex items-center gap-1">
+                            <Trash2 className="w-4 h-4" />
+                            حذف
+                          </Button>
                         </div>
                       </>
                     ) : (
@@ -400,13 +455,24 @@ export default function ServicesForm({
                               "ar-EG",
                             )}
                           </span>
-                          <Button
-                            onClick={() => setEditingServiceId(service.id)}
-                            variant="outline"
-                            size="sm"
-                            disabled={isLoading}>
-                            تعديل
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => setEditingServiceId(service.id)}
+                              variant="outline"
+                              size="sm"
+                              disabled={isLoading}>
+                              تعديل
+                            </Button>
+                            <Button
+                              onClick={() => handleDeleteService(service)}
+                              variant="destructive"
+                              size="sm"
+                              disabled={isLoading}
+                              className="flex items-center gap-1">
+                              <Trash2 className="w-4 h-4" />
+                              حذف
+                            </Button>
+                          </div>
                         </div>
                       </>
                     )}
@@ -417,6 +483,13 @@ export default function ServicesForm({
           </div>
         )}
       </div>
+
+      <CreateServiceModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        projectId={projectId}
+        onCreated={(newService) => setServices((prev) => [...prev, newService])}
+      />
     </div>
   );
 }

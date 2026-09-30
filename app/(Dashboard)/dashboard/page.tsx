@@ -22,6 +22,7 @@ export type ProjectMainData = {
       headline: string;
       subheadline: string;
     };
+    showContactSection: boolean;
   };
 };
 
@@ -37,7 +38,7 @@ export default async function Dashboard() {
     `${APP_URL}/api/dashboard/${CurrentProjectId}/get-project-main-data`,
     {
       cache: "no-store",
-    }
+    },
   );
   const data = (await res.json()) as ProjectMainData;
   return (
@@ -46,6 +47,8 @@ export default async function Dashboard() {
         project={data.data.project}
         siteSettings={data.data.siteSettings}
         heroSectionData={data.data.heroSection}
+        showContactSection={data.data.showContactSection}
+        token={token.value}
       />
     </div>
   );

@@ -103,6 +103,14 @@ export const FetchProjectData = async () => {
         email: "",
         address: "الرياض، المملكة العربية السعودية",
       },
+      socialMediaLinks: {
+        instagram: null,
+        facebook: null,
+        twitter: null,
+        tiktok: null,
+        youtube: null,
+      },
+      customSections: [],
     };
   }
   return { data };

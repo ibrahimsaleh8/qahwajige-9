@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Toast } from "../../_components/Toast";
 import { APP_URL } from "@/lib/ProjectId";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -31,12 +32,16 @@ interface MainDashboardDataProps {
   project: Project;
   siteSettings: SiteSettings;
   heroSectionData: HeroSectionData;
+  showContactSection: boolean;
+  token: string;
 }
 
 export default function MainDashboardData({
   project,
   siteSettings,
   heroSectionData,
+  showContactSection,
+  token,
 }: MainDashboardDataProps) {
   const [formData, setFormData] = useState({
     // Project
@@ -56,6 +61,8 @@ export default function MainDashboardData({
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [contactVisible, setContactVisible] = useState(showContactSection);
+  const route = useRouter();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -89,12 +96,31 @@ export default function MainDashboardData({
         console.error("Error response:", errorData);
         Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });
       }
-      await fetch("/api/revalidate-main-data");
+      console.log("fetch", contactVisible !== showContactSection);
+
+      // Only call the toggle endpoint if the value changed from the original
+      if (contactVisible !== showContactSection) {
+        await fetch(
+          `${APP_URL}/api/dashboard/${project.id}/contact-section/toggle-appear`,
+
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ appear: contactVisible }),
+          },
+        );
+      }
+
+      await fetch("/api/revalidate-metatags");
     } catch (error) {
       console.error("Error saving data:", error);
       Toast({ icon: "error", message: "حدث خطأ أثناء الحفظ" });
     } finally {
       setIsLoading(false);
+      route.refresh();
     }
   };
 
@@ -268,6 +294,32 @@ export default function MainDashboardData({
               required
             />
           </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-xl font-semibold">قسم التواصل</h2>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            id="contact-section-toggle"
+            role="switch"
+            aria-checked={contactVisible}
+            onClick={() => setContactVisible((prev) => !prev)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
+              contactVisible ? "bg-blue-800" : "bg-muted-foreground/30"
+            }`}>
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                contactVisible ? "-translate-x-6" : "translate-x-0"
+              }`}
+            />
+          </button>
+          <label
+            htmlFor="contact-section-toggle"
+            className="text-sm font-medium cursor-pointer select-none">
+            {contactVisible ? "قسم التواصل مُفعَّل" : "قسم التواصل مخفي"}
+          </label>
         </div>
       </div>
 

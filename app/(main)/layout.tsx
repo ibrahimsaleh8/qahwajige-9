@@ -18,6 +18,7 @@ export default async function Layout({
       <FloatedIcons
         whatsapp={data.hero?.whatsApp ?? ""}
         telephone={data.footer.phone ?? ""}
+        socialMedia={data.socialMediaLinks}
       />
       <PreventCopy />
       <Footer {...data.footer} description={data.hero?.subheadline} />

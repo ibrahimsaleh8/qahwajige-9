@@ -10,9 +10,15 @@ import { APP_URL, CurrentProjectId } from "@/lib/ProjectId";
 import { ProjectContentResponse } from "@/lib/responseType";
 import PremiumPackagesSection from "@/components/PremiumPackagesSection";
 import RatingSection from "@/components/RatingSection";
+import CustomSection from "@/components/CustomSection";
+import HomeArticlesSection, {
+  HomeArticle,
+} from "@/components/HomeArticlesSection";
 
 export default async function HomePage() {
   let data;
+  let homeArticles: HomeArticle[] = [];
+
   try {
     const res = await fetch(
       `${APP_URL}/api/project/${CurrentProjectId}/main-data`,
@@ -34,7 +40,20 @@ export default async function HomePage() {
         email: "",
         address: "",
       },
+      customSections: [],
     };
+  }
+
+  try {
+    const articlesRes = await fetch(
+      `${APP_URL}/api/project/${CurrentProjectId}/articles/category/${encodeURIComponent("الصفحة-الرئيسية")}`,
+    );
+    if (articlesRes.ok) {
+      const articlesData = await articlesRes.json();
+      homeArticles = articlesData.data?.articles || [];
+    }
+  } catch (error) {
+    console.error("Failed to fetch home articles:", error);
   }
 
   return (
@@ -43,6 +62,17 @@ export default async function HomePage() {
       <AboutSection {...data.about} />
       <ServicesSection {...data.services} />
       <WhyUsSection {...data.whyUs} />
+
+      {data.customSections &&
+        data.customSections.length > 0 &&
+        data.customSections.map((customSection, index) => (
+          <CustomSection
+            key={customSection.id}
+            {...customSection}
+            index={index}
+          />
+        ))}
+
       <PremiumPackagesSection
         packages={data.packages ?? []}
         whatsapp={data.hero?.whatsApp ?? ""}
@@ -55,7 +85,12 @@ export default async function HomePage() {
 
       <GallerySection gallery={data.gallery} />
       <FAQSection />
-      <ContactSection {...data.footer} whatsapp={data.hero?.whatsApp ?? ""} />
+
+      {data.showContactSection && (
+        <ContactSection {...data.footer} whatsapp={data.hero?.whatsApp ?? ""} />
+      )}
+
+      <HomeArticlesSection articles={homeArticles} />
     </div>
   );
 }
